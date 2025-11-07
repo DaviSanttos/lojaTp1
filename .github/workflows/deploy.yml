@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
 
-  jobs:
+jobs:
   deploy:
     runs-on: ubuntu-latest
 
@@ -12,7 +12,16 @@ on:
       - name: Checkout código
         uses: actions/checkout@v4
 
+      - name: Configurar Node.js (versão mais recente)
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+
+      - name: Instalar dependências
+        run: npm ci
+      
       - name: Disparar Render
+        if: success()
         run: |
           echo "Enviando requisição de deploy para Render..."
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
