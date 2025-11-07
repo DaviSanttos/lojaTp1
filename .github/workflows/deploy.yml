@@ -1,30 +1,42 @@
 name: CI/CD Pipeline
 
+# quando o workflow será executado, push ou quando abrir um pull_request
 on:
   push:
     branches: [ "main" ]
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  pull_request:
+    branches: [ "main" ]
 
+# oq será executado os trabalhos
+jobs:
+  # nome do job principal
+  deploy:
+    runs-on: ubuntu-latest # sistema operacional da máquina de build
+
+    # etapas a serem executadas
     steps:
+    # faz checkout do código
       - name: Checkout código
         uses: actions/checkout@v4
 
+    # configura o node.js na ultima versão
       - name: Configurar Node.js (versão mais recente)
         uses: actions/setup-node@v4
         with:
           node-version: latest
 
+    # instala as dependências do projeto
       - name: Instalar dependências
         run: npm ci
 
+    # roda a build de produção do angular
       - name: Rodar build do Angular (produção)
         run: npm run build -- --configuration production
       
+    # dispara o deploy para o render via HOOK
       - name: Disparar Render
-        if: success()
+        if: github.event_name == 'push && success() # só faz deploy se for push e tiver sucesso em todas as etapas.
         run: |
           echo "Enviando requisição de deploy para Render..."
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
