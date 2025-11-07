@@ -36,7 +36,7 @@ jobs:
       
     # dispara o deploy para o render via HOOK
       - name: Disparar Render
-        if: github.event_name == 'push && success() # só faz deploy se for push e tiver sucesso em todas as etapas.
+        if: github.event_name == 'push' && success() # só faz deploy se for push e tiver sucesso em todas as etapas.
         run: |
           echo "Enviando requisição de deploy para Render..."
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
